@@ -1,0 +1,80 @@
+<!-- QUOTES SECTION -->
+<section class="quotes">
+  <div id="quotes-carousel" class="carousel slide" data-ride="carousel">
+
+    <!-- Loader visible pendant l'appel API -->
+    <div class="loader" id="quotes-loader"></div>
+
+    <!-- Carousel inner (rempli dynamiquement) -->
+    <div class="carousel-inner d-none" id="quotes-content"></div>
+
+    <!-- Controls -->
+    <a class="carousel-control-prev arrow-left" href="#quotes-carousel" role="button" data-slide="prev">
+      <img src="images/arrow_white_left.png" alt="Previous">
+    </a>
+    <a class="carousel-control-next arrow-right" href="#quotes-carousel" role="button" data-slide="next">
+      <img src="images/arrow_white_right.png" alt="Next">
+    </a>
+
+  </div>
+</section>
+
+<!-- LOADER CSS -->
+<style>
+.loader {
+    border: 10px solid #f3f3f3;
+    border-top: 10px solid #C271FF;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 2s linear infinite;
+    margin: auto;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+<!-- QUOTES SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const loader = document.getElementById("quotes-loader");
+    const content = document.getElementById("quotes-content");
+
+    fetch("https://smileschool-api.hbtn.info/quotes")
+        .then(response => response.json())
+        .then(data => {
+            loader.classList.add("d-none");      // cacher loader
+            content.classList.remove("d-none");  // afficher carousel
+
+            data.forEach((quote, index) => {
+                const item = document.createElement("div");
+                item.className = "carousel-item" + (index === 0 ? " active" : "");
+
+                item.innerHTML = `
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col-sm-3 text-center">
+                            <img src="${quote.pic_url}" class="rounded-circle" width="160">
+                        </div>
+                        <div class="col-sm-7 quote-text">
+                            <p>${quote.text}</p>
+                            <h4>${quote.name}</h4>
+                            <span>${quote.title}</span>
+                        </div>
+                    </div>
+                `;
+
+                content.appendChild(item);
+            });
+        })
+        .catch(error => {
+            loader.innerHTML = "<p style='color:white;text-align:center;'>Erreur de chargement</p>";
+            console.error("Erreur API Quotes:", error);
+        });
+});
+</script>
+
