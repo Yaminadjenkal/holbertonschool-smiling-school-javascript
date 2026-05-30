@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileSchool - Popular Tutorials</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="homepage-header">
+
+<!-- HEADER -->
+<header class="header">
+    <nav class="navbar navbar-expand-md navbar-dark container">
+        <a class="navbar-brand" href="#">
+            <img src="images/logo.png" alt="SmileSchool Logo">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-line1"></span>
+            <span class="navbar-line2"></span>
+            <span class="navbar-line3"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="#">COURSES</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">PRICING</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">LOGIN</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero text-center text-white">
+        <h1>Get schooled</h1>
+        <ul class="list-group list-group-horizontal justify-content-center">
+            <li class="list-group-item">SMILES</li>
+            <li class="list-group-item">GRIN</li>
+            <li class="list-group-item">LAUGH</li>
+        </ul>
+        <button class="btn btn-smile mt-4">REGISTER FOR FREE</button>
+        <p class="hero-learn">Learn from the pros</p>
+    </section>
+</header>
+
+<!-- PROS SECTION -->
+<section class="pros text-center text-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-3 pro1">
+                <img src="images/pro_1.png" alt="">
+                <h3>Phillip Massey</h3>
+                <span>« Smile of the year » 2018 - 2019</span>
+            </div>
+            <div class="col-sm-3 pro2">
+                <img src="images/pro_2.png" alt="">
+                <h3>Nannie Lawrence</h3>
+                <span>Best « little smile » 2017</span>
+            </div>
+            <div class="col-sm-3 pro3">
+                <img src="images/pro_3.png" alt="">
+                <h3>Bruce Walters</h3>
+                <span>Best « Friend Smile » live performance 2019</span>
+            </div>
+            <div class="col-sm-3 pro4">
+                <img src="images/pro_4.png" alt="">
+                <h3>Henry Hughes</h3>
+                <span>« 24h smiles » winner 2016 - 2019</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- QUOTES SECTION (déjà dynamique depuis 1-homepage.html) -->
+<section class="quotes">
+  <div id="quotes-carousel" class="carousel slide" data-ride="carousel">
+
+    <div class="loader" id="quotes-loader"></div>
+
+    <div class="carousel-inner d-none" id="quotes-content"></div>
+
+    <a class="carousel-control-prev arrow-left" href="#quotes-carousel" role="button" data-slide="prev">
+      <img src="images/arrow_white_left.png" alt="Previous">
+    </a>
+    <a class="carousel-control-next arrow-right" href="#quotes-carousel" role="button" data-slide="next">
+      <img src="images/arrow_white_right.png" alt="Next">
+    </a>
+
+  </div>
+</section>
+<!-- POPULAR TUTORIALS SECTION -->
+<section class="popular text-center">
+    <div class="container">
+
+        <!-- Title -->
+        <div class="section-header">
+            <h2>Most <span>popular</span> tutorials</h2>
+        </div>
+
+        <!-- Loader (rond qui tourne) -->
+        <div class="loader" id="popular-loader"></div>
+
+        <!-- Carousel container -->
+        <div id="popular-carousel" class="carousel slide d-none" data-ride="carousel">
+
+            <!-- Carousel inner (rempli dynamiquement par JS) -->
+            <div class="carousel-inner" id="popular-content"></div>
+
+            <!-- Controls -->
+            <a class="carousel-control-prev arrow-left" href="#popular-carousel" role="button" data-slide="prev">
+                <img src="images/arrow_black_left.png" alt="Previous">
+            </a>
+            <a class="carousel-control-next arrow-right" href="#popular-carousel" role="button" data-slide="next">
+                <img src="images/arrow_black_right.png" alt="Next">
+            </a>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- LOADER CSS (si pas déjà dans ton fichier) -->
+<style>
+.loader {
+    border: 10px solid #f3f3f3;
+    border-top: 10px solid #C271FF;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 2s linear infinite;
+    margin: auto;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+<!-- POPULAR TUTORIALS SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ------------------------------
+       1. Récupération des éléments
+    ------------------------------ */
+    const loader = document.getElementById("popular-loader");
+    const carousel = document.getElementById("popular-carousel");
+    const content = document.getElementById("popular-content");
+
+    /* ------------------------------
+       2. Appel API
+    ------------------------------ */
+    fetch("https://smileschool-api.hbtn.info/popular-tutorials")
+        .then(response => response.json())
+        .then(data => {
+
+            /* ------------------------------
+               3. Cacher loader / afficher carousel
+            ------------------------------ */
+            loader.classList.add("d-none");
+            carousel.classList.remove("d-none");
+
+            /* ------------------------------
+               4. Création des cartes
+            ------------------------------ */
+            data.forEach((video, index) => {
+
+                const item = document.createElement("div");
+                item.className = "carousel-item" + (index === 0 ? " active" : "");
+
+                item.innerHTML = `
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+
+                            <div class="card">
+                                <img src="${video.thumb_url}" class="card-img-top" alt="thumbnail">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">${video.title}</h5>
+                                    <p class="card-text text-muted">${video["sub-title"]}</p>
+
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="${video.author_pic_url}" class="rounded-circle mr-2" width="40">
+                                        <span class="text-main">${video.author}</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="stars">
+                                            ${'<img src="images/star_on.png">'.repeat(video.star)}
+                                            ${'<img src="images/star_off.png">'.repeat(5 - video.star)}
+                                        </div>
+                                        <span class="text-muted">${video.duration}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+
+                content.appendChild(item);
+            });
+
+        })
+        .catch(error => {
+            loader.innerHTML = "<p style='color:black;text-align:center;'>Erreur de chargement</p>";
+            console.error("Erreur API Popular Tutorials:", error);
+        });
+
+});
+</script>
+<!-- FOOTER -->
+<footer class="footer text-center text-white">
+    <div class="container">
+        <div class="row justify-content-between align-items-center">
+
+            <div class="col-sm-6 footer-item">
+                <img src="images/logo.png" alt="SmileSchool Logo">
+            </div>
+
+            <div class="col-sm-6 footer-item">
+                <ul class="nav justify-content-center social">
+                    <li class="social-item">
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                    </li>
+                    <li class="social-item twitter-icon">
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                    </li>
+                    <li class="social-item">
+                        <a href="#"><i class="fa fa-instagram"></i></a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col trademark">
+                © SmileSchool 2020
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- QUOTES SCRIPT (déjà dynamique) -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const loader = document.getElementById("quotes-loader");
+    const content = document.getElementById("quotes-content");
+
+    fetch("https://smileschool-api.hbtn.info/quotes")
+        .then(response => response.json())
+        .then(data => {
+            loader.classList.add("d-none");
+            content.classList.remove("d-none");
+
+            data.forEach((quote, index) => {
+                const item = document.createElement("div");
+                item.className = "carousel-item" + (index === 0 ? " active" : "");
+
+                item.innerHTML = `
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col-sm-3 text-center">
+                            <img src="${quote.pic_url}" class="rounded-circle" width="160">
+                        </div>
+                        <div class="col-sm-7 quote-text">
+                            <p>${quote.text}</p>
+                            <h4>${quote.name}</h4>
+                            <span>${quote.title}</span>
+                        </div>
+                    </div>
+                `;
+
+                content.appendChild(item);
+            });
+        })
+        .catch(error => {
+            loader.innerHTML = "<p style='color:white;text-align:center;'>Erreur de chargement</p>";
+            console.error("Erreur API Quotes:", error);
+        });
+});
+</script>
+
+<!-- BOOTSTRAP SCRIPTS -->
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>
+
