@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileSchool - Courses</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="courses-header">
+
+<!-- HEADER -->
+<header class="header">
+    <nav class="navbar navbar-expand-md navbar-dark container">
+        <a class="navbar-brand" href="#">
+            <img src="images/logo.png" alt="SmileSchool Logo">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-line1"></span>
+            <span class="navbar-line2"></span>
+            <span class="navbar-line3"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link active" href="courses.html">COURSES</a></li>
+                <li class="nav-item"><a class="nav-link" href="pricing.html">PRICING</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">LOGIN</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero hero-courses text-center text-white">
+        <h1>Learn from the pros</h1>
+    </section>
+</header>
+
+<!-- SEARCH + FILTERS -->
+<section class="search-section text-center">
+    <div class="container">
+
+        <!-- Search bar -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-6">
+                <input type="text" id="search-keywords" class="form-control search-input"
+                       placeholder="Search by keywords...">
+            </div>
+        </div>
+
+        <!-- Dropdowns -->
+        <div class="row justify-content-center">
+
+            <div class="col-md-3 mb-3">
+                <select id="topics-select" class="form-control custom-select">
+                    <option>Loading topics...</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <select id="sort-select" class="form-control custom-select">
+                    <option>Loading sort options...</option>
+                </select>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+<!-- COURSES LIST -->
+<section class="courses-list text-center">
+    <div class="container">
+
+        <!-- Loader pendant le chargement -->
+        <div class="loader" id="courses-loader"></div>
+
+        <!-- Conteneur des cartes (rempli dynamiquement) -->
+        <div class="row" id="courses-container"></div>
+
+    </div>
+</section>
+
+<!-- LOADER CSS (si pas déjà dans ton fichier) -->
+<style>
+.loader {
+    border: 10px solid #f3f3f3;
+    border-top: 10px solid #C271FF;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 2s linear infinite;
+    margin: auto;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+<!-- COURSES SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("search-keywords");
+    const topicsSelect = document.getElementById("topics-select");
+    const sortSelect = document.getElementById("sort-select");
+    const loader = document.getElementById("courses-loader");
+    const container = document.getElementById("courses-container");
+
+    function loadCourses() {
+
+        container.innerHTML = "";
+        loader.classList.remove("d-none");
+
+        const q = searchInput.value;
+        const topic = topicsSelect.value;
+        const sort = sortSelect.value;
+
+        const url = `https://smileschool-api.hbtn.info/courses?q=${q}&topic=${topic}&sort=${sort}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+
+                loader.classList.add("d-none");
+
+                searchInput.value = data.q;
+
+                topicsSelect.innerHTML = "";
+                data.topics.forEach(t => {
+                    const option = document.createElement("option");
+                    option.value = t;
+                    option.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+                    if (t === data.topic) option.selected = true;
+                    topicsSelect.appendChild(option);
+                });
+
+                sortSelect.innerHTML = "";
+                data.sorts.forEach(s => {
+                    const option = document.createElement("option");
+                    option.value = s;
+                    option.textContent = s.replace("_", " ").toUpperCase();
+                    if (s === data.sort) option.selected = true;
+                    sortSelect.appendChild(option);
+                });
+
+                data.courses.forEach(course => {
+
+                    const stars = `
+                        ${'<img src="images/star_on.png">'.repeat(course.star)}
+                        ${'<img src="images/star_off.png">'.repeat(5 - course.star)}
+                    `;
+
+                    const card = document.createElement("div");
+                    card.className = "col-12 col-sm-6 col-md-4 col-lg-3 mb-4";
+
+                    card.innerHTML = `
+                        <div class="card">
+                            <img src="${course.thumb_url}" class="card-img-top" alt="thumbnail">
+
+                            <div class="card-body">
+                                <h5 class="card-title">${course.title}</h5>
+                                <p class="card-text text-muted">${course["sub-title"]}</p>
+
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="${course.author_pic_url}" class="rounded-circle mr-2" width="40">
+                                    <span class="text-main">${course.author}</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="stars">${stars}</div>
+                                    <span class="text-muted">${course.duration}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    container.appendChild(card);
+                });
+
+            })
+            .catch(error => {
+                loader.innerHTML = "<p style='color:black;text-align:center;'>Erreur de chargement</p>";
+                console.error("Erreur API Courses:", error);
+            });
+    }
+
+    loadCourses();
+
+    searchInput.addEventListener<!-- FOOTER -->
+<footer class="footer text-center text-white">
+    <div class="container">
+        <div class="row justify-content-between align-items-center">
+
+            <div class="col-sm-6 footer-item">
+                <img src="images/logo.png" alt="SmileSchool Logo">
+            </div>
+
+            <div class="col-sm-6 footer-item">
+                <ul class="nav justify-content-center social">
+                    <li class="social-item">
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                    </li>
+                    <li class="social-item twitter-icon">
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                    </li>
+                    <li class="social-item">
+                        <a href="#"><i class="fa fa-instagram"></i></a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col trademark">
+                © SmileSchool 2020
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- BOOTSTRAP SCRIPTS -->
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>
+
